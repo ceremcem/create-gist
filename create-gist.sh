@@ -38,7 +38,7 @@ read -r -d '' DESC <<EOF
   "description": "some description",
   "public": true,
   "files": {
-    "${FNAME}": {
+    "$(basename $FNAME)": {
       "content": "${CONTENT}"
     }
   }
