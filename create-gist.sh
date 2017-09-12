@@ -60,4 +60,4 @@ echo "$OUTPUT"
 echo "-----------------" 
 echo " URL: "
 echo "-----------------"
-echo "$OUTPUT" | grep 'raw_url'
+echo "$OUTPUT" | grep 'html_url' | grep 'gist'
