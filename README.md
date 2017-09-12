@@ -1,6 +1,6 @@
 # `create-gist.sh` 
 
-A command line utility to create gist from command line
+A utility to create gists from command line
 
 
         usage: 
