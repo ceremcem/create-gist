@@ -49,8 +49,15 @@ EOF
 
 if [[ "$GITHUB_USERNAME" != "" ]]; then
   # REGISTERED USER
-  curl -u "${GITHUB_USERNAME}" -X POST -d "${DESC}" "https://api.github.com/gists"
+  OUTPUT=$(curl -u "${GITHUB_USERNAME}" -X POST -d "${DESC}" "https://api.github.com/gists")
 else
   # ANONYMOUS GIST :
-  curl -X POST -d "${DESC}" "https://api.github.com/gists"
+  OUTPUT=$(curl -X POST -d "${DESC}" "https://api.github.com/gists")
 fi
+
+echo "$OUTPUT"
+
+echo "-----------------" 
+echo " URL: "
+echo "-----------------"
+echo "$OUTPUT" | grep 'raw_url'
