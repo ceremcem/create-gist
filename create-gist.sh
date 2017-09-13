@@ -32,10 +32,12 @@ GITHUB_USERNAME=$2
 #    Replace EOL by \n
 CONTENT=$(sed -e 's/\r//' -e's/\t/\\t/g' -e 's/"/\\"/g' "${FNAME}" | awk '{ printf($0 "\\n") }')
 
+read -p "Give a description: " DESCRIPTION
+
 # 2. Build the JSON request
 read -r -d '' DESC <<EOF
 {
-  "description": "some description",
+  "description": "$DESCRIPTION",
   "public": true,
   "files": {
     "$(basename $FNAME)": {
