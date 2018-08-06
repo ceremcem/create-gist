@@ -1,7 +1,10 @@
 #!/bin/bash
 # based on: https://gist.github.com/s-leroux/7cb7424d33ba3753e907cc2553bcd1ba
 # modified by: cca
-
+set -u -o pipefail
+set_dir(){ _dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; }; set_dir
+safe_source () { source $1; set_dir; }
+# end of bash boilerplate
 
 print_usage(){
   cat << USAGE
@@ -18,13 +21,13 @@ USAGE
 }
 
 # 0. Your file name
-FNAME=$1
+FNAME=${1:-}
 if [[ -f $FNAME ]]; then
   CONTENT=$(cat $FNAME)
-  GITHUB_USERNAME=$2
+  GITHUB_USERNAME=${2:-}
 else
   CONTENT=$(timeout 2 cat -)
-  GITHUB_USERNAME=$1
+  GITHUB_USERNAME=${1-}
   FNAME="stdin"
   if [[ "$CONTENT" == "" ]]; then
     print_usage
@@ -38,12 +41,14 @@ fi
 #    Replace tabs by \t
 #    Replace " by \"
 #    Replace EOL by \n
-CONTENT=$(echo "${CONTENT}" | sed -e 's/\r//' -e's/\t/\\t/g' -e 's/"/\\"/g' | awk '{ printf($0 "\\n") }')
+CONTENT=$(echo "${CONTENT}" | sed -e 's/\\/\\\\/g' -e 's/\r//' -e's/\t/\\t/g' -e 's/"/\\"/g' | awk '{ printf($0 "\\n") }')
 
 read -p "Give a description: " DESCRIPTION
 
 # 2. Build the JSON request
-read -r -d '' DESC <<EOF
+tmp_file=$(mktemp)
+
+cat > $tmp_file  <<EOF
 {
   "description": "$DESCRIPTION",
   "public": true,
@@ -56,18 +61,22 @@ read -r -d '' DESC <<EOF
 EOF
 
 # 3. Use curl to send a POST request
-
 if [[ "$GITHUB_USERNAME" != "" ]]; then
   # REGISTERED USER
-  OUTPUT=$(curl -u "${GITHUB_USERNAME}" -X POST -d "${DESC}" "https://api.github.com/gists")
-else
-  # ANONYMOUS GIST :
-  OUTPUT=$(curl -X POST -d "${DESC}" "https://api.github.com/gists")
+  USER_PARAM="-u ${GITHUB_USERNAME}"
 fi
 
-echo "$OUTPUT"
+OUTPUT=$(curl ${USER_PARAM:-} -X POST -d @$tmp_file "https://api.github.com/gists")
+uploaded_url=$(echo "$OUTPUT" | grep 'html_url' | grep 'gist')
 
-echo "-----------------" 
-echo " URL: "
-echo "-----------------"
-echo "$OUTPUT" | grep 'html_url' | grep 'gist'
+if [[ ! -z ${uploaded_url:-} ]]; then
+  echo "URL: "
+  echo "-----------------"
+  echo $uploaded_url
+else
+  echo "---------------- ERROR -----------------------"
+  echo "$OUTPUT"
+  echo "-----------------"
+fi
+
+rm $tmp_file
