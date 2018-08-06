@@ -11,11 +11,11 @@ print_usage(){
 
     usage:
 
-        $(basename $0) /path/to/file [Github user name]
+        $(basename $0) /path/to/file Github_user_name
 
         or
 
-        lsusb | $(basename $0) [Github user name]
+        lsusb | $(basename $0) Github_user_name
 
 USAGE
 }
@@ -33,6 +33,11 @@ else
     print_usage
     exit 2
   fi
+fi
+
+if [[ -z $GITHUB_USERNAME ]]; then
+    print_usage
+    exit 2
 fi
 
 
