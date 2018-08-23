@@ -43,12 +43,12 @@ fi
 
 
 # 1. JSON-Stringify the file content:
+#    Replace \ with \\
 #    Remove \r (from Windows end-of-lines)
 #    Replace tabs with \t
 #    Replace " with \"
 #    Replace EOL with \n
-#    Replace \ with \\
-CONTENT=$(echo "${CONTENT}" | sed -e 's/\\/\\\\/g' -e 's/\r//' -e's/\t/\\t/g' -e 's/"/\\"/g' | awk '{ printf($0 "\\n") }')
+CONTENT=$(echo "${CONTENT}" | sed -e 's/\\/\\\\/g' -e 's/\r//' -e's/\t/\\t/g' -e 's/"/\\"/g' | sed -E ':a;N;$!ba;s/\r{0,1}\n/\\n/g')
 
 # 2. Get the description
 read -p "Give a description: " DESCRIPTION
