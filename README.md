@@ -10,3 +10,10 @@ A utility to create gists from command line
 
         lsusb | create-gist.sh Github_user_name
 
+# Dependencies 
+
+* `curl`
+
+```bash
+apt-get install curl
+```
