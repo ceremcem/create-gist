@@ -21,13 +21,13 @@ USAGE
 }
 
 # 0. Your file name
-FNAME=${1:-}
-if [[ -f $FNAME ]]; then
-  CONTENT=$(cat $FNAME)
-  GITHUB_USERNAME=${2:-}
+FNAME="${1:-}"
+if [[ -f "$FNAME" ]]; then
+  CONTENT=$(cat "$FNAME")
+  GITHUB_USERNAME="${2:-}"
 else
   CONTENT=$(timeout 2 cat -)
-  GITHUB_USERNAME=${1-}
+  GITHUB_USERNAME="${1-}"
   FNAME="stdin"
   if [[ "$CONTENT" == "" ]]; then
     print_usage
