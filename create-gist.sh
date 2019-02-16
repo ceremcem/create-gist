@@ -24,10 +24,10 @@ USAGE
 FNAME="${1:-}"
 if [[ -f "$FNAME" ]]; then
   CONTENT=$(cat "$FNAME")
-  GITHUB_USERNAME="${2:-}"
+  GITHUB_TOKEN="${2:-}"
 else
   CONTENT=$(timeout 2 cat -)
-  GITHUB_USERNAME="${1-}"
+  GITHUB_TOKEN="${1-}"
   FNAME="stdin"
   if [[ "$CONTENT" == "" ]]; then
     print_usage
@@ -36,7 +36,7 @@ else
 fi
 
 # Github does not permit anonymous uploads since April 2018
-if [[ -z $GITHUB_USERNAME ]]; then
+if [[ -z $GITHUB_TOKEN ]]; then
     print_usage
     exit 2
 fi
@@ -68,7 +68,7 @@ cat > $tmp_file  <<EOF
 EOF
 
 # 4. Use curl to make a POST request
-OUTPUT=$(curl -u ${GITHUB_USERNAME} -X POST -d @$tmp_file "https://api.github.com/gists")
+OUTPUT=$(curl -H "Authorization: token ${GITHUB_TOKEN}" -X POST -d @$tmp_file "https://api.github.com/gists")
 uploaded_url=$(echo "$OUTPUT" | grep 'html_url' | grep 'gist')
 
 # 5. cleanup the tmp file
