@@ -4,16 +4,18 @@ A utility to create gists from command line
 
     usage:
 
-        create-gist.sh /path/to/file Github_user_name
+        $(basename $0) /path/to/file Github_user_name
 
         or
 
-        lsusb | create-gist.sh Github_user_name
+        lsusb | $(basename $0) Github_user_name
 
         or 
 
-        lsusb | create-gist.sh your_token
+        lsusb | $(basename $0) your_token
 
+    If no credential is passed and $config_file is found, 
+    contents of config file is used. 
 
 # Creating OAuth token
 

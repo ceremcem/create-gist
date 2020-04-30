@@ -6,6 +6,8 @@ set_dir(){ _dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; }; set_dir
 safe_source () { source $1; set_dir; }
 # end of bash boilerplate
 
+config_file=~/.create-gist.cfg
+
 print_usage(){
   cat << USAGE
 
@@ -20,6 +22,9 @@ print_usage(){
         or 
 
         lsusb | $(basename $0) your_token
+
+    If no credential is passed and $config_file is found, 
+    contents of config file is used. 
 
 USAGE
 }
@@ -37,6 +42,11 @@ else
     print_usage
     exit 2
   fi
+fi
+
+if [[ -z $CREDENTIAL ]] && [[ -f $config_file ]]; then
+  echo "Using $config_file for credentials"
+  CREDENTIAL=$(cat $config_file)
 fi
 
 # Github does not permit anonymous uploads since April 2018
