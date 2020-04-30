@@ -10,6 +10,21 @@ A utility to create gists from command line
 
         lsusb | create-gist.sh Github_user_name
 
+        or 
+
+        lsusb | create-gist.sh your_token
+
+
+# Creating OAuth token
+
+1. Go to https://github.com/settings/tokens/new and generate a new token with `create gist` permission.
+2. Use the token for authentication: 
+
+```
+lsusb | create-gist.sh your-token-here
+```
+
+
 # Dependencies 
 
 * `curl`
