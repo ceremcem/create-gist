@@ -17,6 +17,10 @@ print_usage(){
 
         lsusb | $(basename $0) Github_user_name
 
+        or 
+
+        lsusb | $(basename $0) your_token
+
 USAGE
 }
 
@@ -24,10 +28,10 @@ USAGE
 FNAME="${1:-}"
 if [[ -f "$FNAME" ]]; then
   CONTENT=$(cat "$FNAME")
-  GITHUB_TOKEN="${2:-}"
+  CREDENTIAL="${2:-}"
 else
   CONTENT=$(timeout 2 cat -)
-  GITHUB_TOKEN="${1-}"
+  CREDENTIAL="${1-}"
   FNAME="stdin"
   if [[ "$CONTENT" == "" ]]; then
     print_usage
@@ -36,7 +40,7 @@ else
 fi
 
 # Github does not permit anonymous uploads since April 2018
-if [[ -z $GITHUB_TOKEN ]]; then
+if [[ -z $CREDENTIAL ]]; then
     print_usage
     exit 2
 fi
@@ -68,7 +72,15 @@ cat > $tmp_file  <<EOF
 EOF
 
 # 4. Use curl to make a POST request
-OUTPUT=$(curl -H "Authorization: token ${GITHUB_TOKEN}" -X POST -d @$tmp_file "https://api.github.com/gists")
+if [[ ${#CREDENTIAL} -eq 40 ]]; then
+  echo "Using token authentication."
+  OUTPUT=$(curl -H "Authorization: token ${CREDENTIAL}" \
+      -X POST -d @$tmp_file "https://api.github.com/gists")
+else
+  echo "Using username/password authentication."
+  OUTPUT=$(curl -u ${CREDENTIAL} \
+      -X POST -d @$tmp_file "https://api.github.com/gists")
+fi
 uploaded_url=$(echo "$OUTPUT" | grep 'html_url' | grep 'gist')
 
 # 5. cleanup the tmp file
