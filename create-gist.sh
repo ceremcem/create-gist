@@ -13,18 +13,21 @@ print_usage(){
 
     usage:
 
-        $(basename $0) /path/to/file Github_user_name
-
-        or
-
-        lsusb | $(basename $0) Github_user_name
+        $(basename $0) /path/to/file your_token
 
         or 
 
         lsusb | $(basename $0) your_token
 
-    If no credential is passed and $config_file is found, 
-    contents of config file is used. 
+    If no token is passed and $config_file is found,
+    contents of config file is used as the token, so 
+    the usage becomes:
+
+        lsusb | $(basename $0)
+
+        or 
+
+        $(basename $0) /path/to/file 
 
 USAGE
 }
@@ -33,24 +36,28 @@ USAGE
 FNAME="${1:-}"
 if [[ -f "$FNAME" ]]; then
   CONTENT=$(cat "$FNAME")
-  CREDENTIAL="${2:-}"
+  TOKEN="${2:-}"
 else
   CONTENT=$(timeout 2 cat -)
-  CREDENTIAL="${1-}"
+  TOKEN="${1-}"
   FNAME="stdin"
   if [[ "$CONTENT" == "" ]]; then
+    echo "ERROR: Content is empty"
+    echo
     print_usage
     exit 2
   fi
 fi
 
-if [[ -z $CREDENTIAL ]] && [[ -f $config_file ]]; then
+if [[ -z $TOKEN ]] && [[ -f $config_file ]]; then
   echo "Using $config_file for credentials"
-  CREDENTIAL=$(cat $config_file)
+  TOKEN=$(cat $config_file)
 fi
 
 # Github does not permit anonymous uploads since April 2018
-if [[ -z $CREDENTIAL ]]; then
+if [[ -z $TOKEN ]]; then
+    echo "ERROR: Token is missing."
+    echo
     print_usage
     exit 2
 fi
@@ -82,15 +89,9 @@ cat > $tmp_file  <<EOF
 EOF
 
 # 4. Use curl to make a POST request
-if [[ ${#CREDENTIAL} -eq 40 ]]; then
-  echo "Using token authentication."
-  OUTPUT=$(curl -H "Authorization: token ${CREDENTIAL}" \
-      -X POST -d @$tmp_file "https://api.github.com/gists")
-else
-  echo "Using username/password authentication."
-  OUTPUT=$(curl -u ${CREDENTIAL} \
-      -X POST -d @$tmp_file "https://api.github.com/gists")
-fi
+OUTPUT=$(curl -H "Authorization: token ${TOKEN}" \
+    -X POST -d @$tmp_file "https://api.github.com/gists")
+
 uploaded_url=$(echo "$OUTPUT" | grep 'html_url' | grep 'gist')
 
 # 5. cleanup the tmp file

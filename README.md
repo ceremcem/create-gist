@@ -4,28 +4,34 @@ A utility to create gists from command line
 
     usage:
 
-        $(basename $0) /path/to/file Github_user_name
-
-        or
-
-        lsusb | $(basename $0) Github_user_name
+        create-gist.sh /path/to/file your_token
 
         or 
 
-        lsusb | $(basename $0) your_token
+        lsusb | create-gist.sh your_token
 
-    If no credential is passed and $config_file is found, 
-    contents of config file is used. 
+    If no token is passed and /home/ceremcem/.create-gist.cfg is found,
+    contents of config file is used as the token, so 
+    the usage becomes:
+
+        lsusb | create-gist.sh
+
+        or 
+
+        create-gist.sh /path/to/file 
+
 
 # Creating OAuth token
 
-1. Go to https://github.com/settings/tokens/new and generate a new token with `create gist` permission.
-2. Use the token for authentication: 
+1. Go to https://github.com/settings/tokens/new
+2. Generate a new token with `gist` (`create gist`) permission.
+3. Use the token for authentication: 
 
-```
-lsusb | create-gist.sh your-token-here
-```
 
+    lsusb | create-gist.sh your-token-here
+
+
+4. Optionally save your token to `~/.create-gist.cfg` file. 
 
 # Dependencies 
 
