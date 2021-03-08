@@ -10,7 +10,7 @@ A utility to create gists from command line
 
         lsusb | create-gist.sh your_token
 
-    If no token is passed and /home/ceremcem/.create-gist.cfg is found,
+    If no token is passed and ~/.create-gist.cfg is found,
     contents of config file is used as the token, so 
     the usage becomes:
 
